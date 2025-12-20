@@ -17,6 +17,8 @@ const Destinations = () => {
     "Fairy Meadows": FairyMeadowsImg,
   };
 
+  const popularDestinations = ["Hunza Valley", "Skardu"];
+
   // Fetch destinations from backend
   const fetchDestinations = async () => {
     setLoading(true);
@@ -37,7 +39,6 @@ const Destinations = () => {
   useEffect(() => {
     fetchDestinations();
 
-    // Load last selected destination from localStorage
     const savedDest = localStorage.getItem("lastDestination");
     if (savedDest) setLastDestination(savedDest);
   }, []);
@@ -49,7 +50,6 @@ const Destinations = () => {
     return "gray";
   };
 
-  // Filter destinations by search and safety
   const filteredDestinations = destinations.filter((place) => {
     const matchesSearch =
       place.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -58,7 +58,6 @@ const Destinations = () => {
     return matchesSearch && matchesSafety;
   });
 
-  // Handle selecting a destination
   const handleSelectDestination = (name) => {
     setLastDestination(name);
     localStorage.setItem("lastDestination", name);
@@ -107,9 +106,7 @@ const Destinations = () => {
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
       {/* Destinations List */}
-      {!loading && !error && filteredDestinations.length === 0 && (
-        <p>No destinations found.</p>
-      )}
+      {!loading && !error && filteredDestinations.length === 0 && <p>No destinations found.</p>}
 
       {!loading && !error && filteredDestinations.length > 0 && (
         <div
@@ -134,18 +131,38 @@ const Destinations = () => {
               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
               onClick={() => handleSelectDestination(place.name)}
             >
-              {/* Destination Image */}
-              <img
-                src={imageMap[place.name]}
-                alt={place.name}
-                style={{
-                  width: "100%",
-                  height: "150px",
-                  objectFit: "cover",
-                  borderRadius: "5px",
-                  marginBottom: "10px",
-                }}
-              />
+              {/* Destination Image with overlay */}
+              <div style={{ position: "relative" }}>
+                <img
+                  src={imageMap[place.name]}
+                  alt={place.name}
+                  style={{
+                    width: "100%",
+                    height: "150px",
+                    objectFit: "cover",
+                    borderRadius: "5px",
+                    marginBottom: "10px",
+                    transition: "transform 0.3s",
+                  }}
+                />
+                {popularDestinations.includes(place.name) && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      backgroundColor: "gold",
+                      color: "#000",
+                      padding: "2px 6px",
+                      borderRadius: "4px",
+                      fontWeight: "bold",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    ⭐ Popular
+                  </span>
+                )}
+              </div>
 
               <h3>{place.name}</h3>
               <p>
@@ -156,10 +173,28 @@ const Destinations = () => {
                 <span style={{ color: getSafetyColor(place.safety) }}>{place.safety}</span>
               </p>
 
-              {/* Last Selected */}
               {lastDestination === place.name && (
                 <p style={{ color: "#1E40AF", fontWeight: "bold" }}>Last Selected</p>
               )}
+
+              {/* View on Map */}
+              <a
+                href={`https://www.google.com/maps/search/${encodeURIComponent(place.name)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-block",
+                  marginTop: "8px",
+                  padding: "6px 10px",
+                  backgroundColor: "#1E40AF",
+                  color: "#fff",
+                  borderRadius: "4px",
+                  textDecoration: "none",
+                  fontSize: "0.9rem",
+                }}
+              >
+                View on Map
+              </a>
             </div>
           ))}
         </div>
@@ -169,3 +204,4 @@ const Destinations = () => {
 };
 
 export default Destinations;
+
