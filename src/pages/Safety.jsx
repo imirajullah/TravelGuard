@@ -1,25 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const safetyData = [
+  {
+    name: "Hunza Valley",
+    safety: "High",
+    tips: "Carry cash, follow local guidelines, stay on main roads.",
+  },
+  {
+    name: "Skardu",
+    safety: "High",
+    tips: "Weather can change fast, bring warm clothing.",
+  },
+  {
+    name: "Fairy Meadows",
+    safety: "Medium",
+    tips: "Avoid hiking alone, check weather conditions.",
+  },
+];
 
 const Safety = () => {
-  const [filter, setFilter] = useState("");
+  const [lastViewed, setLastViewed] = useState("");
 
-  const safetyData = [
-    {
-      name: "Hunza Valley",
-      safety: "High",
-      tips: "Carry cash, follow local guidelines, stay on main roads.",
-    },
-    {
-      name: "Skardu",
-      safety: "High",
-      tips: "Weather can change fast, bring warm clothing.",
-    },
-    {
-      name: "Fairy Meadows",
-      safety: "Medium",
-      tips: "Avoid hiking alone, check weather conditions.",
-    },
-  ];
+  // Load last viewed from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("lastSafety");
+    if (saved) setTimeout(() => setLastViewed(saved), 0);
+  }, []);
+
+  const handleView = (name) => {
+    setLastViewed(name);
+    localStorage.setItem("lastSafety", name);
+  };
 
   const getSafetyColor = (level) => {
     if (level === "High") return "green";
@@ -28,57 +39,33 @@ const Safety = () => {
     return "gray";
   };
 
-  const filteredData = safetyData.filter((item) =>
-    filter ? item.safety === filter : true
-  );
-
   return (
     <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
       <h1 style={{ marginBottom: "15px" }}>TravelGuard Safety Info</h1>
 
-      {/* Filter */}
-      <div style={{ marginBottom: "15px" }}>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          style={{ padding: "8px", borderRadius: "5px" }}
-        >
-          <option value="">All Safety Levels</option>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-        </select>
-      </div>
-
-      {/* Safety Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: "15px",
-        }}
-      >
-        {filteredData.map((item, index) => (
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+        {safetyData.map((place) => (
           <div
-            key={index}
+            key={place.name}
+            onClick={() => handleView(place.name)}
             style={{
-              border: `2px solid ${getSafetyColor(item.safety)}`,
+              border: lastViewed === place.name ? "2px solid #1E40AF" : "1px solid #ccc",
               borderRadius: "8px",
               padding: "15px",
-              boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-              transition: "transform 0.2s",
+              cursor: "pointer",
+              boxShadow: lastViewed === place.name ? "0 4px 10px rgba(0,0,0,0.2)" : "0 2px 5px rgba(0,0,0,0.1)",
+              transition: "all 0.2s",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <h3>{item.name}</h3>
+            <h3>{place.name}</h3>
             <p>
               <strong>Safety:</strong>{" "}
-              <span style={{ color: getSafetyColor(item.safety) }}>
-                {item.safety}
-              </span>
+              <span style={{ color: getSafetyColor(place.safety) }}>{place.safety}</span>
             </p>
-            <p>{item.tips}</p>
+            <p>{place.tips}</p>
+            {lastViewed === place.name && (
+              <p style={{ color: "#1E40AF", fontWeight: "bold" }}>Last Viewed</p>
+            )}
           </div>
         ))}
       </div>
