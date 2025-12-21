@@ -5,7 +5,8 @@ import Home from "./pages/Home";
 import Destinations from "./pages/Destinations";
 import Budget from "./pages/Budget";
 import Safety from "./pages/Safety";
-import Navbar from "./components/Navbar/Navbar";
+import Navbar from "./components/Navbar";
+
 // import Footer from "./components/Footer/Footer"; // Optional if you add footer later
 
 function App() {
