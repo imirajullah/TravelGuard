@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { getDestinations } from "../services/api";
 import DestinationCard from "../components/DestinationCard";
 import Loader from "../components/Loader";
-import MapView from "../components/MapView";
+import MapView from "../components/MapView";import SafetyChart from "../components/SafetyChart";
+
+
 
 const Destinations = () => {
   const [destinations, setDestinations] = useState([]);
@@ -47,6 +49,7 @@ const Destinations = () => {
 
       {/* Map */}
       <MapView locations={destinations} />
+      <SafetyChart destinations={destinations} />
 
       {/* Grid of Destination Cards */}
       <div
