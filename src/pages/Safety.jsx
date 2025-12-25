@@ -66,7 +66,7 @@ const Safety = () => {
             {lastViewed === place.name && (
               <p style={{ color: "#1E40AF", fontWeight: "bold" }}>Last Viewed</p>
             )}
-          </div>
+           </div>
         ))}
       </div>
     </div>
