@@ -12,7 +12,7 @@ import Navbar from "./components/Navbar";
 function App() {
   return (
     <Router>
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh " }}>
         {/* Navbar always visible */}
         <Navbar />
 
