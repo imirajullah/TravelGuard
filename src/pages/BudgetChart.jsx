@@ -15,7 +15,7 @@ const BudgetChart = ({ budgets }) => {
           ))}
         </ul>
       ) : (
-        <p>No saved budgets yet.</p>
+        <p>No saved  budgets yet.</p>
       )}
     </div>
   );

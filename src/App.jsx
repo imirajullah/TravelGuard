@@ -14,7 +14,7 @@ function App() {
     <Router>
       <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh " }}>
         {/* Navbar always visible */}
-        <Navbar />
+        <Navbar  />
 
         {/* Main content */}
         <div style={{ flex: 1, padding: "20px" }}>
