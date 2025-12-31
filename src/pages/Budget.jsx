@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import "./Budget.css";
 import BudgetChart from "../components/BudgetChart";
 
 

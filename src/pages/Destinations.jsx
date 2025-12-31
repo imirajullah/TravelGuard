@@ -1,5 +1,6 @@
 // client/src/pages/Destinations.jsx
 import { useEffect, useState } from "react";
+import "./Destinations.css";
 import { getDestinations } from "../services/api";
 import DestinationCard from "../components/DestinationCard";
 import Loader from "../components/Loader";

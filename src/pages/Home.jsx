@@ -1,4 +1,5 @@
 import React from "react";  // ✅ only once
+import "./Home.css";
 
 const Home = () => {
   return (
