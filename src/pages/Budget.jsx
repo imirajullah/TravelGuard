@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import BudgetChart from "./BudgetChart";
+import BudgetChart from "../components/BudgetChart";
 
 
 // Accommodation options with icons and rates
