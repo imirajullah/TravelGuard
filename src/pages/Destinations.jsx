@@ -4,12 +4,14 @@ import "./Destinations.css";
 import { getDestinations } from "../services/api";
 import DestinationCard from "../components/DestinationCard";
 import Loader from "../components/Loader";
-import MapView from "../components/MapView";import SafetyChart from "../components/SafetyChart";
-
-
+import MapView from "../components/MapView";
+import SafetyChart from "../components/SafetyChart";
 
 const Destinations = () => {
   const [destinations, setDestinations] = useState([]);
+  const [filteredDestinations, setFilteredDestinations] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [safetyFilter, setSafetyFilter] = useState("All");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -19,7 +21,6 @@ const Destinations = () => {
     try {
       const data = await getDestinations();
 
-      // Add lat/lng for map display (hardcoded for now)
       const withCoords = data.map((d) => {
         let lat = 0,
           lng = 0;
@@ -30,6 +31,7 @@ const Destinations = () => {
       });
 
       setDestinations(withCoords);
+      setFilteredDestinations(withCoords);
     } catch {
       setError("Failed to load destinations");
     } finally {
@@ -37,33 +39,71 @@ const Destinations = () => {
     }
   };
 
+  // 🔍 Search + Filter logic
+  useEffect(() => {
+    let results = destinations;
+
+    if (searchTerm) {
+      results = results.filter(
+        (d) =>
+          d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          d.country.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (safetyFilter !== "All") {
+      results = results.filter((d) => d.safety === safetyFilter);
+    }
+
+    setFilteredDestinations(results);
+  }, [searchTerm, safetyFilter, destinations]);
+
   useEffect(() => {
     fetchDestinations();
   }, []);
 
   if (loading) return <Loader />;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1000px", margin: "0 auto" }}>
+    <div className="destinations-container">
       <h1>TravelGuard Destinations</h1>
 
-      {/* Map */}
-      <MapView locations={destinations} />
-      <SafetyChart destinations={destinations} />
+      {/* Controls */}
+      <div className="controls">
+        <input
+          type="text"
+          placeholder="Search by name or country..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-      {/* Grid of Destination Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: "16px",
-          marginTop: "20px",
-        }}
-      >
-        {destinations.map((place) => (
-          <DestinationCard key={place.name} place={place} />
-        ))}
+        <select
+          value={safetyFilter}
+          onChange={(e) => setSafetyFilter(e.target.value)}
+        >
+          <option value="All">All Safety Levels</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+
+        <button onClick={fetchDestinations}>🔄 Refresh</button>
+      </div>
+
+      {/* Map & Chart */}
+      <MapView locations={filteredDestinations} />
+      <SafetyChart destinations={filteredDestinations} />
+
+      {/* Cards */}
+      <div className="destinations-grid">
+        {filteredDestinations.length === 0 ? (
+          <p>No destinations found.</p>
+        ) : (
+          filteredDestinations.map((place) => (
+            <DestinationCard key={place.name} place={place} />
+          ))
+        )}
       </div>
     </div>
   );
