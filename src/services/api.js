@@ -1,9 +1,11 @@
+import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api";
+const API = axios.create({
+  baseURL: "http://localhost:5000/api"
+});
 
 export const getDestinations = async () => {
-  const res = await fetch(`${BASE_URL}/destinations`);
-  if (!res.ok) throw new Error("API error");
-  return res.json();
+  const res = await API.get("/destinations");
+  return res.data;
 };
 

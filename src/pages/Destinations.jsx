@@ -19,11 +19,21 @@ const Destinations = () => {
     setLoading(true);
     setError("");
     try {
-      const data = await getDestinations();
+      // ✅ Try real backend first
+      let data = await getDestinations();
 
+      // ⚡ Fallback dummy data if backend returns empty
+      if (!data || data.length === 0) {
+        data = [
+          { name: "Hunza Valley", country: "Pakistan", safety: "High", tips: "Stay on main roads" },
+          { name: "Skardu", country: "Pakistan", safety: "High", tips: "Weather changes fast" },
+          { name: "Fairy Meadows", country: "Pakistan", safety: "Medium", tips: "Avoid hiking alone" },
+        ];
+      }
+
+      // Add lat/lng for map
       const withCoords = data.map((d) => {
-        let lat = 0,
-          lng = 0;
+        let lat = 0, lng = 0;
         if (d.name === "Hunza Valley") { lat = 36.3; lng = 74.6; }
         else if (d.name === "Skardu") { lat = 35.3; lng = 75.6; }
         else if (d.name === "Fairy Meadows") { lat = 35.5; lng = 73.5; }
@@ -32,14 +42,15 @@ const Destinations = () => {
 
       setDestinations(withCoords);
       setFilteredDestinations(withCoords);
-    } catch {
+    } catch (err) {
+      console.error("Error fetching destinations:", err);
       setError("Failed to load destinations");
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔍 Search + Filter logic
+  // 🔍 Search + Filter
   useEffect(() => {
     let results = destinations;
 
@@ -58,6 +69,7 @@ const Destinations = () => {
     setFilteredDestinations(results);
   }, [searchTerm, safetyFilter, destinations]);
 
+  // Fetch on mount
   useEffect(() => {
     fetchDestinations();
   }, []);
@@ -91,11 +103,11 @@ const Destinations = () => {
         <button onClick={fetchDestinations}>🔄 Refresh</button>
       </div>
 
-      {/* Map & Chart */}
+      {/* Map & Safety Chart */}
       <MapView locations={filteredDestinations} />
       <SafetyChart destinations={filteredDestinations} />
 
-      {/* Cards */}
+      {/* Destination Cards */}
       <div className="destinations-grid">
         {filteredDestinations.length === 0 ? (
           <p>No destinations found.</p>
