@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
 });
 
 // Component to auto-fit map bounds based on markers
-const FitBounds = ({ locations }) => {
+const FitBounds = ({  locations }) => {
   const map = useMap();
   if (locations.length === 0) return null;
 
