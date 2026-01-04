@@ -50,4 +50,4 @@ const MapView = ({ locations }) => {
   );
 };
 
-export default MapView;
+export default  MapView;
