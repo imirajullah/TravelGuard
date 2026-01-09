@@ -1,3 +1,189 @@
-.budget {
-  padding: 20px;
+/* ===== Budget Page Wrapper ===== */
+.budget-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 30px 15px;
+}
+
+/* ===== Main Card ===== */
+.budget-card {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.budget-card h1 {
+  text-align: center;
+  color: #1e40af;
+  margin-bottom: 24px;
+  font-size: 1.8rem;
+}
+
+/* ===== Inputs & Selects ===== */
+.budget-card input,
+.budget-card select {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.budget-card input:focus,
+.budget-card select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* ===== Buttons ===== */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.btn-row button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  background: #1e40af;
+  color: #ffffff;
+}
+
+.btn-row button:hover {
+  transform: translateY(-1px);
+  background: #1d4ed8;
+}
+
+.btn-row .danger {
+  background: #dc2626;
+}
+
+.btn-row .danger:hover {
+  background: #b91c1c;
+}
+
+/* ===== Total Cost ===== */
+.total {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #1e40af;
+}
+
+/* ===== Warning ===== */
+.warning {
+  margin-bottom: 10px;
+  color: #dc2626;
+  font-weight: 600;
+  text-align: center;
+  animation: pulse 1.2s infinite;
+}
+
+/* ===== Save Button ===== */
+.save-btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.save-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ===== Saved Budgets ===== */
+.budget-card h2 {
+  margin-top: 24px;
+  margin-bottom: 10px;
+  color: #1e40af;
+  font-size: 1.2rem;
+}
+
+.saved-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.saved-item span {
+  font-size: 0.9rem;
+}
+
+.saved-item button {
+  background: #dc2626;
+  border: none;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.saved-item button:hover {
+  background: #b91c1c;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+  .budget-card {
+    padding: 24px;
+  }
+
+  .budget-card h1 {
+    font-size: 1.5rem;
+  }
+
+  .total {
+    font-size: 1.2rem;
+  }
 }
