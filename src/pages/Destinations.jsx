@@ -7,6 +7,12 @@ import Loader from "../components/Loader";
 import MapView from "../components/MapView";
 import SafetyChart from "../components/SafetyChart";
 
+const COORDS = {
+  "Hunza Valley": { lat: 36.3, lng: 74.6 },
+  "Skardu": { lat: 35.3, lng: 75.6 },
+  "Fairy Meadows": { lat: 35.5, lng: 73.5 },
+};
+
 const Destinations = () => {
   const [destinations, setDestinations] = useState([]);
   const [filteredDestinations, setFilteredDestinations] = useState([]);
@@ -18,11 +24,11 @@ const Destinations = () => {
   const fetchDestinations = async () => {
     setLoading(true);
     setError("");
+
     try {
-      // ✅ Try real backend first
       let data = await getDestinations();
 
-      // ⚡ Fallback dummy data if backend returns empty
+      // Fallback data
       if (!data || data.length === 0) {
         data = [
           { name: "Hunza Valley", country: "Pakistan", safety: "High", tips: "Stay on main roads" },
@@ -31,30 +37,27 @@ const Destinations = () => {
         ];
       }
 
-      // Add lat/lng for map
-      const withCoords = data.map((d) => {
-        let lat = 0, lng = 0;
-        if (d.name === "Hunza Valley") { lat = 36.3; lng = 74.6; }
-        else if (d.name === "Skardu") { lat = 35.3; lng = 75.6; }
-        else if (d.name === "Fairy Meadows") { lat = 35.5; lng = 73.5; }
-        return { ...d, lat, lng };
-      });
+      const enriched = data.map((d) => ({
+        ...d,
+        lat: COORDS[d.name]?.lat || 0,
+        lng: COORDS[d.name]?.lng || 0,
+      }));
 
-      setDestinations(withCoords);
-      setFilteredDestinations(withCoords);
+      setDestinations(enriched);
+      setFilteredDestinations(enriched);
     } catch (err) {
-      console.error("Error fetching destinations:", err);
-      setError("Failed to load destinations");
+      console.error(err);
+      setError("Failed to load destinations.");
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔍 Search + Filter
+  // Search + Safety filter
   useEffect(() => {
-    let results = destinations;
+    let results = [...destinations];
 
-    if (searchTerm) {
+    if (searchTerm.trim()) {
       results = results.filter(
         (d) =>
           d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -69,7 +72,6 @@ const Destinations = () => {
     setFilteredDestinations(results);
   }, [searchTerm, safetyFilter, destinations]);
 
-  // Fetch on mount
   useEffect(() => {
     fetchDestinations();
   }, []);
@@ -103,14 +105,14 @@ const Destinations = () => {
         <button onClick={fetchDestinations}>🔄 Refresh</button>
       </div>
 
-      {/* Map & Safety Chart */}
+      {/* Map & Chart */}
       <MapView locations={filteredDestinations} />
       <SafetyChart destinations={filteredDestinations} />
 
-      {/* Destination Cards */}
+      {/* Cards */}
       <div className="destinations-grid">
         {filteredDestinations.length === 0 ? (
-          <p>No destinations found.</p>
+          <p className="empty">No destinations found.</p>
         ) : (
           filteredDestinations.map((place) => (
             <DestinationCard key={place.name} place={place} />
