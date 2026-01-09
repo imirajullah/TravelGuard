@@ -1,3 +1,68 @@
-.safety {
+.safety-container {
   padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.safety-container h1 {
+  text-align: center;
+  color: #1e40af;
+  margin-bottom: 20px;
+}
+
+.safety-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.safety-card {
+  background: #fff;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.safety-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.safety-card.active {
+  border: 2px solid #1e40af;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.safety-card h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.1rem;
+  color: #1f2937;
+}
+
+.safety-card p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+.safety-card .tips {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.safety-card .last-viewed {
+  color: #1e40af;
+  font-weight: bold;
+  margin-top: 6px;
+  text-align: right;
+}
+
+@media (max-width: 480px) {
+  .safety-grid {
+    grid-template-columns: 1fr;
+  }
 }
