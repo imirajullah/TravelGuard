@@ -5,12 +5,14 @@ const DestinationCard = ({ place }) => (
       border: "1px solid #ccc",
       padding: "15px",
       borderRadius: "8px",
+      marginBottom: "10px",
     }}
   >
     <h3>{place.name}</h3>
-    <p>Country: {place.country}</p>
-    <p>Safety: {place.safety}</p>
+    <p>Latitude: {place.latitude}</p>
+    <p>Longitude: {place.longitude}</p>
   </div>
 );
 
 export default DestinationCard;
+

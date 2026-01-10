@@ -1,132 +1,103 @@
-// client/src/pages/Destinations.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import mapboxgl from "mapbox-gl";
 import "./Destinations.css";
-import MapView from "../components/MapView";
+import { getDestinations } from "../services/api";
 import DestinationCard from "../components/DestinationCard";
-import Loader from "../components/Loader";
 
-// Fallback Pakistani cities
-const FALLBACK_CITIES = [
-  { name: "Karachi", country: "Pakistan", safety: "Medium", tips: "Avoid crowded areas", lat: 24.8607, lng: 67.0011 },
-  { name: "Lahore", country: "Pakistan", safety: "Medium", tips: "Follow local guidelines", lat: 31.5497, lng: 74.3436 },
-  { name: "Islamabad", country: "Pakistan", safety: "High", tips: "Stay on main roads", lat: 33.6844, lng: 73.0479 },
-  { name: "Peshawar", country: "Pakistan", safety: "Low", tips: "Travel with caution", lat: 34.0151, lng: 71.5249 },
-  { name: "Quetta", country: "Pakistan", safety: "Medium", tips: "Check weather and roads", lat: 30.1798, lng: 66.9750 },
-];
+mapboxgl.accessToken = "YOUR_MAPBOX_TOKEN"; // Replace with your token
 
 const Destinations = () => {
+  const [query, setQuery] = useState("");
   const [destinations, setDestinations] = useState([]);
-  const [filteredDestinations, setFilteredDestinations] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [safetyFilter, setSafetyFilter] = useState("All");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const mapContainer = useRef(null);
+  const map = useRef(null);
+  const markersRef = useRef([]);
 
-  // Load cities (fallback first)
-  const fetchDestinations = async () => {
-    setLoading(true);
-    try {
-      // Try to fetch from GeoDB API
-      const response = await fetch(
-        "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=PK&limit=100",
-        {
-          method: "GET",
-          headers: {
-            "X-RapidAPI-Key": "c1a0e97292mshd89e6a2de50922cp16d5b7jsn2c0f4bd6f049",
-            "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error("API failed");
-
-      const data = await response.json();
-
-      const enriched = data.data.map((city) => ({
-        name: city.name,
-        country: city.country,
-        safety: "Unknown",
-        tips: "Follow local guidelines.",
-        lat: city.latitude,
-        lng: city.longitude,
-      }));
-
-      setDestinations(enriched);
-      setFilteredDestinations(enriched);
-    } catch (err) {
-      console.warn("GeoDB API failed, using fallback cities.", err);
-
-      // Use fallback if API fails
-      setDestinations(FALLBACK_CITIES);
-      setFilteredDestinations(FALLBACK_CITIES);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Filter + search
+  // Initialize map once
   useEffect(() => {
-    let results = [...destinations];
+    if (!mapContainer.current || map.current) return;
 
-    if (searchTerm.trim()) {
-      results = results.filter(
-        (d) =>
-          d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          d.country.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [71.5249, 33.6844], // Pakistan center
+      zoom: 5,
+    });
 
-    if (safetyFilter !== "All") {
-      results = results.filter((d) => d.safety === safetyFilter);
-    }
-
-    setFilteredDestinations(results);
-  }, [searchTerm, safetyFilter, destinations]);
-
-  useEffect(() => {
-    fetchDestinations();
+    map.current.addControl(new mapboxgl.NavigationControl());
   }, []);
 
-  if (loading) return <Loader />;
+  // Update markers when destinations change
+  useEffect(() => {
+    if (!map.current) return;
+
+    // Remove old markers
+    markersRef.current.forEach((m) => m.remove());
+    markersRef.current = [];
+
+    // Add new markers
+    destinations.forEach((d) => {
+      const marker = new mapboxgl.Marker()
+        .setLngLat([d.longitude, d.latitude])
+        .setPopup(new mapboxgl.Popup().setText(d.name))
+        .addTo(map.current);
+      markersRef.current.push(marker);
+    });
+
+    // Center map on first result
+    if (destinations.length > 0) {
+      const { latitude, longitude } = destinations[0];
+      map.current.flyTo({ center: [longitude, latitude], zoom: 10 });
+    }
+  }, [destinations]);
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!query) return;
+
+    setLoading(true);
+    try {
+      const data = await getDestinations(query);
+      setDestinations(data);
+    } catch (err) {
+      console.error(err);
+      setDestinations([]);
+    }
+    setLoading(false);
+  };
 
   return (
-    <div className="destinations-container">
-      <h1>TravelGuard Destinations</h1>
-
-      <div className="controls">
+    <div className="destinations-page">
+      {/* Search Bar */}
+      <form className="search-form" onSubmit={handleSearch}>
         <input
           type="text"
-          placeholder="Search by name or country..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={query}
+          placeholder="Search a place in Pakistan"
+          onChange={(e) => setQuery(e.target.value)}
         />
+        <button type="submit">Search</button>
+      </form>
 
-        <select
-          value={safetyFilter}
-          onChange={(e) => setSafetyFilter(e.target.value)}
-        >
-          <option value="All">All Safety Levels</option>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-          <option value="Unknown">Unknown</option>
-        </select>
+      {/* Map */}
+      <div ref={mapContainer} className="map-container"></div>
 
-        <button onClick={fetchDestinations}>🔄 Refresh</button>
-      </div>
+      {/* Loading */}
+      {loading && <p>Loading...</p>}
 
-      <MapView locations={filteredDestinations} />
-
-      <div className="destinations-grid">
-        {filteredDestinations.length === 0 ? (
-          <p className="empty">No destinations found.</p>
-        ) : (
-          filteredDestinations.map((place) => (
-            <DestinationCard key={place.name} place={place} />
-          ))
+      {/* Destination Cards */}
+      <div className="destinations-list">
+        {query && destinations.length === 0 && !loading && (
+          <p>No destinations found</p>
         )}
+        {destinations.map((d, i) => (
+          <DestinationCard key={i} place={d} />
+        ))}
       </div>
     </div>
   );
 };
 
 export default Destinations;
+
